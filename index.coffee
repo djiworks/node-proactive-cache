@@ -33,8 +33,6 @@ class ExpirationCache
     # @_length = 0
     @_itemCount = 0
 
-    @reset()
-
 
   reset: ->
     self = this
@@ -103,20 +101,24 @@ class ExpirationCache
       @_clearTimer item
       @_addTimer item, @_expirationDelay, true
 
-    return item.value || null
+    return item?.value || null
 
 
   # Does NOT renew expiration timeout
   peek: (key) ->
-    return @_cache[key] || null
+    return @_cache[key]?.value || null
 
 
   mget: (keys) ->
+    self = this
     if not _.isArray(keys)
       throw new Error('Bad arguments. Waiting for Array type')
 
-    return _.pick(@_cache, keys)
+    results = {}
+    _.each keys, (key) ->
+      results[key] = self.get(key)
 
+    return results
 
   del: (key) ->
     if @has(key)
@@ -144,7 +146,11 @@ class ExpirationCache
 
 
   values: ->
-    return _.values @_cache
+    return _.chain(@_cache)
+            .values()
+            .map (item) ->
+              return item.value
+            .value()
 
 
   itemCount: ->

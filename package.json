@@ -1,10 +1,10 @@
 {
   "name": "node-expiration-cache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "simple in memory key/value cache with autoclean by timeout",
   "main": "index.coffee",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -R spec --compilers coffee:coffee-script/register"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,11 @@
   "dependencies": {
     "clone": "^1.0.2",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "coffee-script": "1.8.0",
+    "chai": "1.9.2",
+    "mocha": "1.21.5",
+    "sinon": "1.11.1"
   }
 }
