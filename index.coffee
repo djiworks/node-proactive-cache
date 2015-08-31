@@ -36,8 +36,9 @@ class ExpirationCache
 
   reset: ->
     self = this
-    _.each @_cache, (value, key) ->
-      self._dispose(key, self._cache[key].value)
+    _.each @_cache, (item, key) ->
+      self._clearTimer item, 'reset'
+      #self._dispose(key, item.value)
 
     @_cache = {}
     # @_length = 0
@@ -54,8 +55,8 @@ class ExpirationCache
       item.delay = item.delay || delay
     
     item.timer = setTimeout ->
-      self._dispose item.key, item.value
       self.del item.key
+      self._dispose item.key, item.value
     , item.delay
 
 
@@ -72,7 +73,7 @@ class ExpirationCache
       usedValue = value
 
     if @has(key)
-      item = @get key
+      item = @_cache[key]
       item.value = usedValue
       @_cache[key] = item # Useful ? Actually, object is passed by ref
       
@@ -122,7 +123,7 @@ class ExpirationCache
 
   del: (key) ->
     if @has(key)
-      item = @get key
+      item = @_cache[key]
       @_clearTimer item
       @_itemCount--
       delete @_cache[key]

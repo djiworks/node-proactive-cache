@@ -5,6 +5,7 @@ sinon = require 'sinon'
 Cache = require("../")
 
 instance = null
+diposeFunc = null
 
 
 describe 'node expiration cache', ->
@@ -62,6 +63,9 @@ describe 'node expiration cache', ->
       expect(items['1']).to.exist
       expect(items['test2']).to.not.exist
 
+    it 'should throw error on wrong args', ->
+      expect(instance.mget).to.throw(Error)
+
     it 'should get all keys from cache', ->
       items = instance.keys()
       expect(items).to.exist
@@ -110,20 +114,60 @@ describe 'node expiration cache', ->
       instance.mdel ['fake2', '5']
       expect(instance.itemCount()).to.eql(1)
 
+    it 'should throw error on wrong args', ->
+      expect(instance.mdel).to.throw(Error)
+
     it 'should reset cache', ->
       instance.reset()
       expect(instance.itemCount()).to.eql(0)
+      expect(instance.keys()).to.eql([])
 
-  describe 'Expirations', ->
+  describe 'Expirations with renew option', ->
     before ->
       instance = new Cache
         expirationDelay: 1000
         dispose: (key, value) ->
+          diposeFunc(key, value)
           # May use stub or event emitter to test dispoe function
       expect(instance).to.exist
 
+    afterEach ->
+      instance.reset()
+      expect(instance.keys()).to.eql([])
 
+    it 'should call dipose function after inserting', (done) ->
+      @timeout 3000
+      key = 'key'
+      value = 'value'
+      diposeFunc = (_key, _value) ->
+        expect(_key).to.eql(key)
+        expect(_value).to.eql(value)
+        done()
 
+      instance.set key, value
+
+    it 'should NOT call dipose function after deleting', (done) ->
+      @timeout 3000
+      key = 'key2'
+      value = 'value2'
+      disposed = false
+      
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      instance.del key
+      setTimeout ->
+        expect(disposed).to.be.false
+        done()
+      , 1500
+
+    it 'should renew expiration delay on set', ->
+    it 'should renew expiration delay on get', ->
+    it 'should NOT renew expiration delay on peek', ->
+
+  describe 'Expirations without renew option', ->
+  describe 'Clones', ->
 
 
 
