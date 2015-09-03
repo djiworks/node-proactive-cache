@@ -9,12 +9,6 @@ class ExpirationCache
       expirationDelay: 60000 # Delay to make item as expired (ms)
       renewExpiration: true # Clear expiration on item if true
 
-      ###
-      # Default function to compute cache length
-      length: ->
-        return 1
-      ###
-
       # Function to call when item expired
       # This is sync method
       dispose: (key, value) ->
@@ -23,16 +17,14 @@ class ExpirationCache
     , options
 
     @_cache = {} # Store entries
-    # @_lengthComputer = options.length # Function to compute cache length
+
     @_expirationDelay = options.expirationDelay
     @_dispose = options.dispose
 
     @_renewExpiration = options.renewExpiration
     @_useClones = options.useClones
     
-    # @_length = 0
     @_itemCount = 0
-
 
   reset: ->
     self = this
@@ -41,9 +33,7 @@ class ExpirationCache
       #self._dispose(key, item.value)
 
     @_cache = {}
-    # @_length = 0
     @_itemCount = 0
-
 
   # useExisting allows to keep the previous delay used on item
   _addTimer: (item, delay, useExisting) ->
@@ -59,10 +49,8 @@ class ExpirationCache
       self._dispose item.key, item.value
     , item.delay
 
-
   _clearTimer: (item) ->
     clearTimeout item.timer
-
 
   set: (key, value, expirationDelay) ->
     expirationDelay = expirationDelay || @_expirationDelay
@@ -94,7 +82,6 @@ class ExpirationCache
 
     return true
 
-
   get: (key) ->
     item = @_cache[key]
 
@@ -104,11 +91,9 @@ class ExpirationCache
 
     return item?.value || null
 
-
   # Does NOT renew expiration timeout
   peek: (key) ->
     return @_cache[key]?.value || null
-
 
   mget: (keys) ->
     self = this
@@ -128,7 +113,6 @@ class ExpirationCache
       @_itemCount--
       delete @_cache[key]
 
-
   mdel: (keys) ->
     self = this
     if not _.isArray(keys)
@@ -137,14 +121,11 @@ class ExpirationCache
     _.each keys, (key) ->
       self.del key
 
-
   keys: ->
     return _.keys @_cache
 
-
   has: (key) ->
     return _.has @_cache, key
-
 
   values: ->
     return _.chain(@_cache)
@@ -153,14 +134,8 @@ class ExpirationCache
               return item.value
             .value()
 
-
   itemCount: ->
     return @_itemCount
 
-
-  ###
-  length: ->
-    return @_length
-  ###
 
 module.exports = ExpirationCache

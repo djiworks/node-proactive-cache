@@ -1,5 +1,6 @@
 expect = require('chai').expect
 sinon = require 'sinon'
+clone = require 'clone'
 
 
 Cache = require("../")
@@ -128,7 +129,7 @@ describe 'node expiration cache', ->
         expirationDelay: 1000
         dispose: (key, value) ->
           diposeFunc(key, value)
-          # May use stub or event emitter to test dispoe function
+          # May use stub or event emitter to test dispose function
       expect(instance).to.exist
 
     afterEach ->
@@ -162,15 +163,147 @@ describe 'node expiration cache', ->
         done()
       , 1500
 
-    it 'should renew expiration delay on set', ->
-    it 'should renew expiration delay on get', ->
-    it 'should NOT renew expiration delay on peek', ->
+    it 'should renew expiration delay on set', (done) ->
+      @timeout 3000
+      key = 'key3'
+      value = 'value3'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      setTimeout ->
+        instance.set key, value
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 1500
+      , 500
+
+    it 'should renew expiration delay on set with new delay option'
+    , (done) ->
+      @timeout 3000
+      key = 'key4'
+      value = 'value4'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      setTimeout ->
+        instance.set key, value, 500
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 1000
+      , 500
+
+    it 'should renew expiration delay on get', (done) ->
+      @timeout 3000
+      key = 'key5'
+      value = 'value5'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      setTimeout ->
+        instance.get key
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 1500
+      , 500
+
+    it 'should renew expiration delay on get using older delay'
+    , (done) ->
+      @timeout 3000
+      key = 'key6'
+      value = 'value6'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value, 500
+      setTimeout ->
+        instance.get key
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 750
+      , 250
+
+    it 'should NOT renew expiration delay on peek'
+    , (done) ->
+      @timeout 2000
+      key = 'key7'
+      value = 'value7'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value, 500
+      setTimeout ->
+        instance.peek key
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 300
+      , 250
 
   describe 'Expirations without renew option', ->
+
   describe 'Clones', ->
+    afterEach ->
+      instance.reset()
+      expect(instance.keys()).to.eql([])
 
+    it 'should return object at the inserted state', (done) ->
+      instance = new Cache
+        expirationDelay: 1000
+        dispose: (key, value) ->
+          diposeFunc(key, value)
 
+      expect(instance).to.exist
 
+      obj = {prop: true, sub: {test: true}}
+      refObj = clone(obj)
+      key = 'obj'
+      cachedObj = null
+      diposeFunc = (_key, _value) ->
+        cachedObj = _value
 
+      instance.set key, obj
+      obj.sub.test = false
+      gettedObj = instance.get(key)
+      expect(gettedObj).to.deep.eql(refObj)
+      expect(gettedObj).to.not.deep.eql(obj)
+      setTimeout ->
+        expect(cachedObj).to.deep.eql(refObj)
+        expect(cachedObj).to.not.deep.eql(obj)
+        done()
+      , 1250
 
+    it 'should return object at the current state', (done) ->
+      instance = new Cache
+        expirationDelay: 1000
+        useClones: false
+        dispose: (key, value) ->
+          diposeFunc(key, value)
 
+      expect(instance).to.exist
+
+      obj = {prop: true, sub: {test: true}}
+      key = 'obj'
+      cachedObj = null
+      diposeFunc = (_key, _value) ->
+        cachedObj = _value
+
+      instance.set key, obj
+      obj.sub.test = false
+      gettedObj = instance.get(key)
+      expect(gettedObj).to.deep.eql(obj)
+      setTimeout ->
+        expect(cachedObj).to.deep.eql(obj)
+        done()
+      , 1250
