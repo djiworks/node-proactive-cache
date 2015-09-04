@@ -173,6 +173,7 @@ describe 'node expiration cache', ->
 
       instance.set key, value
       setTimeout ->
+        expect(disposed).to.be.false
         instance.set key, value
         setTimeout ->
           expect(disposed).to.be.true
@@ -252,6 +253,52 @@ describe 'node expiration cache', ->
       , 250
 
   describe 'Expirations without renew option', ->
+    before ->
+      instance = new Cache
+        expirationDelay: 1000
+        renewExpiration: false
+        dispose: (key, value) ->
+          diposeFunc(key, value)
+          # May use stub or event emitter to test dispose function
+      expect(instance).to.exist
+
+    afterEach ->
+      instance.reset()
+      expect(instance.keys()).to.eql([])
+
+    it 'should expire even if item changes', (done) ->
+      @timeout 2000
+      key = 'key8'
+      value = 'value8'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      setTimeout ->
+        instance.set key, value
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 1000
+      , 500
+
+    it 'should expire even after a get call', (done) ->
+      @timeout 2000
+      key = 'key9'
+      value = 'value9'
+      disposed = false
+      diposeFunc = (_key, _value) ->
+        disposed = true
+
+      instance.set key, value
+      setTimeout ->
+        instance.get key
+        setTimeout ->
+          expect(disposed).to.be.true
+          done()
+        , 1000
+      , 500
 
   describe 'Clones', ->
     afterEach ->
