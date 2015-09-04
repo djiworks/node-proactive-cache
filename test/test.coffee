@@ -7,7 +7,7 @@ Cache = require("../")
 
 instance = null
 disposeFunc = null
-clock = sinon.useFakeTimers()
+clock = null
 
 
 describe 'node expiration cache', ->
@@ -134,6 +134,9 @@ describe 'node expiration cache', ->
           # May use stub or event emitter to test dispose function
       expect(instance).to.exist
 
+    beforeEach ->
+      clock = sinon.useFakeTimers()
+
     afterEach ->
       clock.restore()
       disposeFunc.reset()
@@ -141,7 +144,6 @@ describe 'node expiration cache', ->
       expect(instance.keys()).to.eql([])
 
     it 'should call dipose function after inserting', ->
-      @timeout 3000
       key = 'key'
       value = 'value'
       disposeFunc.withArgs(key, value)
@@ -162,92 +164,77 @@ describe 'node expiration cache', ->
       expect(disposeFunc.withArgs(key, value).called).to.be.false
       expect(disposeFunc.called).to.be.false
 
-    it 'should renew expiration delay on set', (done) ->
-      @timeout 3000
+    it 'should renew expiration delay on set', ->
       key = 'key3'
       value = 'value3'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value
-      setTimeout ->
-        expect(disposeFunc.called).to.be.false
-        instance.set key, value
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 1500
-      , 500
+      clock.tick(500)
+      expect(disposeFunc.called).to.be.false
 
-    it 'should renew expiration delay on set with new delay option'
-    , (done) ->
-      @timeout 3000
+      instance.set key, value
+      clock.tick(501)
+      expect(disposeFunc.called).to.be.false
+
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
+
+    it 'should renew expiration delay on set with new delay option', ->
       key = 'key4'
       value = 'value4'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value
-      setTimeout ->
-        instance.set key, value, 500
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 1000
-      , 500
+      clock.tick(500)
+      instance.set key, value, 500
 
-    it 'should renew expiration delay on get', (done) ->
-      @timeout 3000
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
+
+    it 'should renew expiration delay on get', ->
       key = 'key5'
       value = 'value5'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value
-      setTimeout ->
-        instance.get key
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 1500
-      , 500
+      clock.tick(500)
+      instance.get key
+      clock.tick(501)
+      expect(disposeFunc.called).to.be.false
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
 
-    it 'should renew expiration delay on get using older delay'
-    , (done) ->
-      @timeout 3000
+    it 'should renew expiration delay on get using older delay', ->
       key = 'key6'
       value = 'value6'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value, 500
-      setTimeout ->
-        instance.get key
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 750
-      , 250
+      clock.tick(250)
+      instance.get key
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
 
-    it 'should NOT renew expiration delay on peek'
-    , (done) ->
-      @timeout 2000
+    it 'should NOT renew expiration delay on peek', ->
       key = 'key7'
       value = 'value7'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value, 500
-      setTimeout ->
-        instance.peek key
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 300
-      , 250
+      clock.tick(250)
+      instance.peek key
+      clock.tick(251)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
 
   describe 'Expirations without renew option', ->
     before ->
+      disposeFunc = sinon.spy()
       instance = new Cache
         expirationDelay: 1000
         renewExpiration: false
@@ -256,48 +243,50 @@ describe 'node expiration cache', ->
           # May use stub or event emitter to test dispose function
       expect(instance).to.exist
 
+    beforeEach ->
+      clock = sinon.useFakeTimers()
+
     afterEach ->
+      clock.restore()
+      disposeFunc.reset()
       instance.reset()
       expect(instance.keys()).to.eql([])
 
-    it 'should expire even if item changes', (done) ->
+    it 'should expire even if item changes', ->
       @timeout 2000
       key = 'key8'
       value = 'value8'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value
-      setTimeout ->
-        instance.set key, value
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 1000
-      , 500
-
-    it 'should expire even after a get call', (done) ->
-      @timeout 2000
+      clock.tick(500)
+      instance.set key, value
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
+  
+    it 'should expire even after a get call',  ->
       key = 'key9'
       value = 'value9'
       disposeFunc.withArgs(key, value)
 
       instance.set key, value
-      setTimeout ->
-        instance.get key
-        setTimeout ->
-          expect(disposeFunc.withArgs(key, value).called).to.be.true
-          expect(disposeFunc.called).to.be.true
-          done()
-        , 1000
-      , 500
+      clock.tick(500)
+      instance.get key
+      clock.tick(501)
+      expect(disposeFunc.withArgs(key, value).called).to.be.true
+      expect(disposeFunc.called).to.be.true
 
   describe 'Clones', ->
+    beforeEach ->
+      clock = sinon.useFakeTimers()
+
     afterEach ->
+      clock.restore()
       instance.reset()
       expect(instance.keys()).to.eql([])
 
-    it 'should return object at the inserted state', (done) ->
+    it 'should return object at the inserted state', ->
       instance = new Cache
         expirationDelay: 1000
         dispose: (key, value) ->
@@ -317,13 +306,11 @@ describe 'node expiration cache', ->
       gettedObj = instance.get(key)
       expect(gettedObj).to.deep.eql(refObj)
       expect(gettedObj).to.not.deep.eql(obj)
-      setTimeout ->
-        expect(cachedObj).to.deep.eql(refObj)
-        expect(cachedObj).to.not.deep.eql(obj)
-        done()
-      , 1250
+      clock.tick(1200)
+      expect(cachedObj).to.deep.eql(refObj)
+      expect(cachedObj).to.not.deep.eql(obj)
 
-    it 'should return object at the current state', (done) ->
+    it 'should return object at the current state', ->
       instance = new Cache
         expirationDelay: 1000
         useClones: false
@@ -342,7 +329,5 @@ describe 'node expiration cache', ->
       obj.sub.test = false
       gettedObj = instance.get(key)
       expect(gettedObj).to.deep.eql(obj)
-      setTimeout ->
-        expect(cachedObj).to.deep.eql(obj)
-        done()
-      , 1250
+      clock.tick(1200)
+      expect(cachedObj).to.deep.eql(obj)
