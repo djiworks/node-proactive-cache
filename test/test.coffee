@@ -6,7 +6,7 @@ clone = require 'clone'
 Cache = require("../")
 
 instance = null
-diposeFunc = null
+disposeFunc = null
 
 
 describe 'node expiration cache', ->
@@ -128,7 +128,7 @@ describe 'node expiration cache', ->
       instance = new Cache
         expirationDelay: 1000
         dispose: (key, value) ->
-          diposeFunc(key, value)
+          disposeFunc(key, value)
           # May use stub or event emitter to test dispose function
       expect(instance).to.exist
 
@@ -140,7 +140,7 @@ describe 'node expiration cache', ->
       @timeout 3000
       key = 'key'
       value = 'value'
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         expect(_key).to.eql(key)
         expect(_value).to.eql(value)
         done()
@@ -153,7 +153,7 @@ describe 'node expiration cache', ->
       value = 'value2'
       disposed = false
       
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -168,7 +168,7 @@ describe 'node expiration cache', ->
       key = 'key3'
       value = 'value3'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -187,7 +187,7 @@ describe 'node expiration cache', ->
       key = 'key4'
       value = 'value4'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -204,7 +204,7 @@ describe 'node expiration cache', ->
       key = 'key5'
       value = 'value5'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -222,7 +222,7 @@ describe 'node expiration cache', ->
       key = 'key6'
       value = 'value6'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value, 500
@@ -240,7 +240,7 @@ describe 'node expiration cache', ->
       key = 'key7'
       value = 'value7'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value, 500
@@ -258,7 +258,7 @@ describe 'node expiration cache', ->
         expirationDelay: 1000
         renewExpiration: false
         dispose: (key, value) ->
-          diposeFunc(key, value)
+          disposeFunc(key, value)
           # May use stub or event emitter to test dispose function
       expect(instance).to.exist
 
@@ -271,7 +271,7 @@ describe 'node expiration cache', ->
       key = 'key8'
       value = 'value8'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -288,7 +288,7 @@ describe 'node expiration cache', ->
       key = 'key9'
       value = 'value9'
       disposed = false
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         disposed = true
 
       instance.set key, value
@@ -309,7 +309,7 @@ describe 'node expiration cache', ->
       instance = new Cache
         expirationDelay: 1000
         dispose: (key, value) ->
-          diposeFunc(key, value)
+          disposeFunc(key, value)
 
       expect(instance).to.exist
 
@@ -317,7 +317,7 @@ describe 'node expiration cache', ->
       refObj = clone(obj)
       key = 'obj'
       cachedObj = null
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         cachedObj = _value
 
       instance.set key, obj
@@ -336,14 +336,14 @@ describe 'node expiration cache', ->
         expirationDelay: 1000
         useClones: false
         dispose: (key, value) ->
-          diposeFunc(key, value)
+          disposeFunc(key, value)
 
       expect(instance).to.exist
 
       obj = {prop: true, sub: {test: true}}
       key = 'obj'
       cachedObj = null
-      diposeFunc = (_key, _value) ->
+      disposeFunc = (_key, _value) ->
         cachedObj = _value
 
       instance.set key, obj
