@@ -3,8 +3,16 @@ A simple in memory key/value cache with proactive cleaning. Actually, the cache 
 Each item of the cache has their own timer to avoid setInterval on an empty cache.
 
 ## Usage:
-```coffee
-#TODO
+```javascript
+var Cache = require("cache"); // To rename
+var options = {
+    expirationDelay: 5000, //ms
+    dispose: function (key, value) { console.log('key:', key, 'value:', value); }
+};
+var myCache = new Cache(options);
+cache.set('key', 'value');
+cache.get("key");
+
 ```
 
 ## Options
@@ -16,17 +24,18 @@ Each item of the cache has their own timer to avoid setInterval on an empty cach
 
 ## API
 
-* `set(key, value, *delay*)` *(optional: `delay`)*
+* `set(key, value, [delay])` *(optional: `delay`)*
     
     Add or update an item in the cache. 
     Delay allow you to overwrite the global `expirationDelay` on a specific item.
     If it's an update, the expiration delay of this item will be renew.
 
-* `get(key) => value`
+* `get(key)`
     
     Returns the key value (or `null` if not found) renewing the expiration delay.
 
-* `mget(keys) => values`
+* `mget(keys)`
+
     Returns an object with keys as properties `{'key1': 'value1', 'key2': 'value2'}`
     (or an empty object `{}` if no keys found). For each key, the expiration delay will be renew.
 
