@@ -74,9 +74,12 @@ cache.get("key");
     
 ## Test
 
+Run:
 ```bash
   npm test
 ```
+
+There are about 35 tests using [Sinon.js](http://sinonjs.org/) and [ChaiJS](http://chaijs.com/)
 
 ## Licence
 
