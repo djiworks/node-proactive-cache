@@ -1,5 +1,5 @@
 # Simple NodeJs internal caching
-A simple in memory key/value cache with proactive cleaning. Actually, the cache is based on a single object.
+A simple in memory key/value cache with proactive cleaning. Actually, the cache is based on a single object (so the cache size limit depends on max size of a single object).
 Each item of the cache has their own timer to avoid setInterval on an empty cache.
 
 ## Usage:
