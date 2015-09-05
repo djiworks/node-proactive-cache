@@ -71,6 +71,12 @@ cache.get("key");
 * `itemCount()`
 
     Returns total quantity of objects currently in cache.
+    
+## Test
+
+```bash
+  npm test
+```
 
 ## Licence
 
