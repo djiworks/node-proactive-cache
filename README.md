@@ -1,6 +1,6 @@
 # Simple NodeJs in-memory caching
-A simple in memory key/value cache with proactive cleaning. Actually, the cache is based on a single object (so the cache size limit depends on max size of a single object).
-Each item of the cache has their own timer to avoid setInterval on an empty cache.
+A simple in memory key/value cache with proactive cleaning. Actually, the cache is based on a single object (So the cache size limit depends on max size of a single object).
+Each item of the cache has its own timer to avoid setInterval on an empty cache.
 
 [![NPM](https://nodei.co/npm/proactive-cache.png?downloads=true&stars=true)](https://nodei.co/npm/proactive-cache/)
 
@@ -22,14 +22,14 @@ cache.get("key");
 * `useClones` *(default: `true`)*: Enable or disable cloning on variables. If `true`, all items will be deeply cloned before storing in the cache. Otherwise, only the reference will be saved.
 * `expirationDelay` *(default: `60000`)*: Delay in ms before removing the item from the cache.
 * `renewExpiration` *(default: `true`)*: Enable or disable the renewal of the delay when getting or storing an item
-* `dispose(key, value)`: Function called when an item expired. This function will be synchronious
+* `dispose(key, value)`: Function called when an item expired. This function will be synchronous
 
 ## API
 
 * `set(key, value, [delay])` *(optional: `delay`)*
     
     Add or update an item in the cache. 
-    Delay allow you to overwrite the global `expirationDelay` on a specific item.
+    Delay allows you to overwrite the global `expirationDelay` on a specific item.
     If it's an update, the expiration delay of this item will be renew.
 
 * `get(key)`
@@ -55,7 +55,7 @@ cache.get("key");
 
 * `reset()`
 
-    Clears the cache entirely, throwing away all values and clearing all item timers 
+    Clears the cache entirely, throwing away all values and clearing all timers items
     without calling dispose function.
 
 * `has(key)`
