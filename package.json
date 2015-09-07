@@ -1,27 +1,31 @@
 {
   "name": "node-expiration-cache",
-  "version": "0.0.3",
-  "description": "simple in memory key/value cache with autoclean by timeout",
-  "main": "index.coffee",
+  "version": "1.0.0",
+  "description": "simple in memory key/value cache with proactive autoclean",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "mocha -R spec --compilers coffee:coffee-script/register"
+    "pretest": "npm run compile",
+    "prepublish": "npm run compile",
+    "test": "mocha -R spec --compilers coffee:coffee-script/register",
+    "compile": "coffee --compile --output lib/ src/"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/djiworks/node-expiration-cache.git"
+    "url": "https://github.com/djiworks/node-proactive-cache.git"
   },
   "keywords": [
     "cache",
-    "expirations",
+    "expiration",
     "timeout",
-    "key/value"
+    "key/value",
+    "proactive"
   ],
   "author": "Djothi Grondin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/djiworks/node-expiration-cache/issues"
+    "url": "https://github.com/djiworks/node-proactive-cache"
   },
-  "homepage": "https://github.com/djiworks/node-expiration-cache",
+  "homepage": "https://github.com/djiworks/node-proactive-cache",
   "dependencies": {
     "clone": "^1.0.2",
     "underscore": "^1.8.3"

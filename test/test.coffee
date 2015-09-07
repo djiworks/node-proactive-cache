@@ -3,7 +3,7 @@ sinon = require 'sinon'
 clone = require 'clone'
 
 
-Cache = require("../")
+Cache = require("../lib")
 
 instance = null
 disposeFunc = null

@@ -2,7 +2,7 @@ _ = require 'underscore'
 clone = require 'clone'
 
 
-class ExpirationCache
+class ProactiveCache
   constructor: (options = {}) ->
     options = _.extend
       useClones: true # Store only cloned items
@@ -138,4 +138,4 @@ class ExpirationCache
     return @_itemCount
 
 
-module.exports = ExpirationCache
+module.exports = ProactiveCache

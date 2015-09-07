@@ -4,7 +4,7 @@ Each item of the cache has their own timer to avoid setInterval on an empty cach
 
 ## Usage:
 ```javascript
-var Cache = require("cache"); // To rename
+var Cache = require("proactive-cache");
 var options = {
     expirationDelay: 5000, //ms
     dispose: function (key, value) { console.log('key:', key, 'value:', value); }
