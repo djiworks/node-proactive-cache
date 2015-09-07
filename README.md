@@ -12,8 +12,8 @@ var options = {
     dispose: function (key, value) { console.log('key:', key, 'value:', value); }
 };
 var myCache = new Cache(options);
-cache.set('key', 'value');
-cache.get("key");
+myCache.set('key', 'value');
+myCache.get("key");
 
 ```
 
